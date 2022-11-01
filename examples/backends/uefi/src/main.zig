@@ -120,7 +120,9 @@ pub fn main() Status {
             time.last_update_timestamp = now_ms;
         }
 
-        back_buffer.fill(Color.black);
+        const maybe_clear_color = if (@hasDecl(example, "clear_color")) example.clear_color else Color.black;
+        if (@as(?Color, maybe_clear_color)) |clear_color|
+            back_buffer.fill(clear_color);
         grid = back_buffer;
 
         example.tick(time) catch return Status.Aborted;
