@@ -1,4 +1,5 @@
 const std = @import("std");
+const ascii = std.ascii;
 
 const backend = @import("backend");
 
@@ -11,8 +12,8 @@ pub fn init() !void {}
 pub fn tick(time: anytype) !void {
     comptime var printables: []const u8 = &[_]u8{};
     comptime var char: u8 = 0;
-    inline while (char < 0b0111_1111) : (char += 1) {
-        if (comptime std.ascii.isPrint(char)) {
+    inline while (ascii.isASCII(char)) : (char += 1) {
+        if (comptime ascii.isPrint(char)) {
             printables = printables ++ [1]u8{char};
             if (char != 32 and char % 32 == 0) {
                 printables = printables ++ [1]u8{'\n'};
