@@ -116,11 +116,11 @@ pub fn Color(comptime Cell: type) type {
     var seen_g = false;
     var seen_b = false;
     for (@typeInfo(Cell).Struct.fields) |field| {
-        if (mem.eql(u8, field.name, "r") and field.field_type == u8)
+        if (mem.eql(u8, field.name, "r") and field.type == u8)
             seen_r = true
-        else if (mem.eql(u8, field.name, "g") and field.field_type == u8)
+        else if (mem.eql(u8, field.name, "g") and field.type == u8)
             seen_g = true
-        else if (mem.eql(u8, field.name, "b") and field.field_type == u8)
+        else if (mem.eql(u8, field.name, "b") and field.type == u8)
             seen_b = true;
     }
 

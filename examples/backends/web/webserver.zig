@@ -12,13 +12,13 @@ const log = std.log;
 pub const log_level = if (@import("builtin").mode == .Debug) .debug else .info;
 
 const media_types = std.ComptimeStringMap([]const u8, .{
-    .{ .@"0" = "html", .@"1" = "text/html" },
-    .{ .@"0" = "css", .@"1" = "text/css" },
-    .{ .@"0" = "js", .@"1" = "text/javascript" },
-    .{ .@"0" = "wasm", .@"1" = "application/wasm" },
-    .{ .@"0" = "ico", .@"1" = "image/x-icon" },
-    .{ .@"0" = "otf", .@"1" = "font/otf" },
-    .{ .@"0" = "png", .@"1" = "image/png" },
+    .{ "html", "text/html" },
+    .{ "css", "text/css" },
+    .{ "js", "text/javascript" },
+    .{ "wasm", "application/wasm" },
+    .{ "ico", "image/x-icon" },
+    .{ "otf", "font/otf" },
+    .{ "png", "image/png" },
 });
 
 pub fn main() u8 {
