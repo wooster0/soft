@@ -2,7 +2,6 @@
 //!
 //! This and GraphicsPipeline.zig and others are heavily inspired by https://vulkan-tutorial.com/
 
-
 const std = @import("std");
 const mem = std.mem;
 const math = std.math;
@@ -166,7 +165,6 @@ fn isPhysicalDeviceSuitable(
     return true;
 }
 
-
 fn checkPhysicalDeviceExtensionSupport(allocator: mem.Allocator, physical_device: c.VkPhysicalDevice) !bool {
     var extension_count: u32 = undefined;
     if (c.vkEnumerateDeviceExtensionProperties(physical_device, null, &extension_count, null) != c.VK_SUCCESS)
@@ -179,7 +177,7 @@ fn checkPhysicalDeviceExtensionSupport(allocator: mem.Allocator, physical_device
     const required_extensions = required_logical_device_extensions;
 
     var extension_checklist = [1]bool{false} ** required_extensions.len;
-    for (required_extensions) |required_extension, index| {
+    for (required_extensions, 0..) |required_extension, index| {
         for (extensions) |extension| {
             if (mem.eql(
                 u8,
@@ -222,7 +220,7 @@ const QueueFamilyIndices = struct {
             .presentation_family = null,
         };
 
-        for (queue_families) |queue_family, index| {
+        for (queue_families, 0..) |queue_family, index| {
             // std.debug.print("index: {d} 2: {d}\n", .{index, index2});
             if (queue_family.queueFlags & c.VK_QUEUE_GRAPHICS_BIT == 1)
                 queue_family_indices.graphics_family = @intCast(u32, index);
@@ -273,7 +271,7 @@ fn createLogicalDeviceAndQueues(
     };
     std.debug.print("{any}\n", .{unique_queue_families});
     var device_queue_create_infos: [unique_queue_families.len]c.VkDeviceQueueCreateInfo = undefined;
-    for (unique_queue_families) |queue_family, index|
+    for (unique_queue_families, 0..) |queue_family, index|
         device_queue_create_infos[index] = mem.zeroInit(c.VkDeviceQueueCreateInfo, .{
             .sType = c.VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             .queueFamilyIndex = queue_family,
@@ -493,7 +491,7 @@ fn createImageViews(
     images: []c.VkImage,
 ) ![]c.VkImageView {
     var image_views = try allocator.alloc(c.VkImageView, images.len);
-    for (image_views) |*image_view, index| {
+    for (image_views, 0..) |*image_view, index| {
         const create_info = mem.zeroInit(c.VkImageViewCreateInfo, .{
             .sType = c.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
             .image = images[index],

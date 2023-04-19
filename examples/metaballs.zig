@@ -5,7 +5,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 const wool = @import("wool");
-const backend = @import("backend");
+const backend = @import("root"); // TODO: https://github.com/ziglang/zig/issues/14708: @import("backend");
 
 const Grid = backend.Grid;
 const grid = &backend.grid;
@@ -31,7 +31,7 @@ const ball_border_radius: f32 = 25;
 pub fn init() !void {
     var prng = std.rand.DefaultPrng.init(backend.seed);
     const random = prng.random();
-    for (balls) |*ball| {
+    for (&balls) |*ball| {
         ball.x = random.intRangeAtMost(isize, 0, @intCast(isize, grid.width));
         ball.y = random.intRangeAtMost(isize, 0, @intCast(isize, grid.height));
         ball.dx = if (random.boolean()) -1 else 1;
@@ -43,7 +43,7 @@ pub const clear_color = Color.white;
 
 pub fn tick(time: anytype) !void {
     // move the balls
-    for (balls) |*ball| {
+    for (&balls) |*ball| {
         if (ball.x + ball.dx >= grid.width or ball.x + ball.dx < 0)
             ball.dx *= -1;
         if (ball.y + ball.dy >= grid.height or ball.y + ball.dy < 0)

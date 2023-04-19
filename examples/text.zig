@@ -1,7 +1,7 @@
 const std = @import("std");
 const ascii = std.ascii;
 
-const backend = @import("backend");
+const backend = @import("root"); // TODO: https://github.com/ziglang/zig/issues/14708: @import("backend");
 
 const Grid = backend.Grid;
 const grid = &backend.grid;
@@ -12,7 +12,7 @@ pub fn init() !void {}
 pub fn tick(time: anytype) !void {
     comptime var printables: []const u8 = &[_]u8{};
     comptime var char: u8 = 0;
-    inline while (ascii.isASCII(char)) : (char += 1) {
+    inline while (comptime ascii.isASCII(char)) : (char += 1) {
         if (comptime ascii.isPrint(char)) {
             printables = printables ++ [1]u8{char};
             if (char != 32 and char % 32 == 0) {

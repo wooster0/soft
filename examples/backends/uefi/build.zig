@@ -1,27 +1,30 @@
 const std = @import("std");
+const Build = std.Build;
+const Module = Build.Module;
 
 pub fn build(
-    b: *std.build.Builder,
-    mode: std.builtin.Mode,
-    wool_pkg: std.build.Pkg,
-    example_pkg: std.build.Pkg,
-    other_pkg: std.build.Pkg,
-) !void {
-    const efi = b.addExecutable("bootx64", "examples/backends/uefi/src/main.zig");
-    efi.addPackage(wool_pkg);
-    efi.addPackage(example_pkg);
-    efi.addPackage(other_pkg);
-    efi.setBuildMode(mode);
-    efi.setTarget(.{
-        .cpu_arch = .x86_64,
-        .os_tag = .uefi,
-        .abi = .msvc,
+    b: *Build.Builder,
+    optimize: std.builtin.OptimizeMode,
+    wool_module: *Module,
+    example_module: *Module,
+    other_module: *Module,
+) void {
+    const exe = b.addExecutable(.{
+        .name = "bootx64",
+        .root_source_file = .{ .path = "examples/backends/uefi/src/main.zig" },
+        .optimize = optimize,
+        .target = .{
+            .cpu_arch = .x86_64,
+            .os_tag = .uefi,
+            .abi = .msvc,
+        },
     });
-    efi.setOutputDir("zig-out");
-    efi.install();
-
-    // NB: TODO: when you see "lld-link: warning: /align specified without /driver; image may not run",
-    //           ignore it; it'll be resolved: https://github.com/ziglang/zig/issues/7484
+    exe.addModule("wool", wool_module);
+    exe.addModule("example", example_module);
+    exe.addModule("other", other_module);
+    //efi.setOutputDir("zig-out");
+    //exe.override_dest_dir = .{ .custom = "." };
+    b.installArtifact(exe);
 
     const image_path = "zig-out/uefi-example.img";
     // TODO: rewrite this using (the probably more widely available) `qemu-img`?

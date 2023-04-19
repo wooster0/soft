@@ -24,7 +24,6 @@ pipeline: c.VkPipeline,
 pipeline_layout: c.VkPipelineLayout,
 render_pass: c.VkRenderPass,
 
-
 pub fn init(logical_device: c.VkDevice, swap_chain_extent: c.VkExtent2D, swap_chain_image_format: c.VkFormat) GraphicsPipeline {
     //
     // programmable shaders
@@ -53,7 +52,6 @@ pub fn init(logical_device: c.VkDevice, swap_chain_extent: c.VkExtent2D, swap_ch
     });
 
     const shader_stages = [_]c.VkPipelineShaderStageCreateInfo{ vertex_shader_stage_info, fragment_shader_stage_info };
-
 
     //
     // fixed-function stages

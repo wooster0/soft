@@ -3,27 +3,30 @@
 const std = @import("std");
 const fmt = std.fmt;
 const mem = std.mem;
-
-const wool_pkg = std.build.Pkg{
-    .name = "wool",
-    .source = .{ .path = "src/main.zig" },
-};
+const os = std.os;
+const Build = std.Build;
+const Module = Build.Module;
 
 pub fn build(b: *std.build.Builder) !void {
-    const mode = b.standardReleaseOptions();
-    prepTests(b, mode);
-    try prepExamples(b, mode);
+    const wool_module = b.createModule(.{
+        .source_file = .{ .path = "src/main.zig" },
+    });
+    const optimize = b.standardOptimizeOption(.{});
+    prepTests(b, optimize, wool_module);
+    try prepExamples(b, optimize, wool_module);
     // TODO: add a step named "example-test" or similar that compiles (but doesn't run)
     //       all examples with all example backends to check for regressions,
     //       or even better: don't produce binaries but only do the semantic analysis.
     //       in that case it can be done as part of "zig build test" rather than a separate command
 }
 
-fn prepTests(b: *std.build.Builder, mode: std.builtin.Mode) void {
-    const tests = b.addTest(wool_pkg.source.path);
-    tests.setBuildMode(mode);
+fn prepTests(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_module: *Module) void {
+    const tests = b.addTest(.{
+        .root_source_file = .{ .path = "src/main.zig" },
+        .optimize = optimize,
+    });
     const test_step = b.step("test", "Run all tests");
-    tests.addPackage(wool_pkg);
+    tests.addModule("wool", wool_module);
     test_step.dependOn(&tests.step);
 }
 
@@ -38,7 +41,7 @@ const example_backend_names = example_backend_names: {
     break :example_backend_names names;
 };
 
-fn prepExamples(b: *std.build.Builder, mode: std.builtin.Mode) !void {
+fn prepExamples(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_module: *Module) !void {
     // there are two ways to get arguments:
     // * b.option
     // * b.args
@@ -52,28 +55,30 @@ fn prepExamples(b: *std.build.Builder, mode: std.builtin.Mode) !void {
             \\                               {s} (default: terminal)
         , .{try mem.join(b.allocator, ", ", example_backend_names)}),
     );
-    if (maybe_example_name) |example_name|
+    if (maybe_example_name) |example_name| {
         // TODO: maybe come up with a better default example backend
         //       that is native, based on the target?
         //       something like this:
         //       Windows -> DirectX
         //       Linux -> Vulkan
         //       other cases -> OpenGL
-        return buildExample(b, mode, example_name, example_backend orelse "terminal")
-    else if (example_backend != null)
-        std.debug.print("specify an example with -Dexample\n", .{})
-    else
-        b.getInstallStep().dependOn(&b.addLog(
-            \\use `-Dexample` and `-Dbackend` to specify example and backend, respectively.
-            \\for example:
-            \\`zig build -Dexample=rectangle -Dbackend=terminal`
+        return buildExample(b, optimize, example_name, example_backend orelse "terminal", wool_module);
+    } else if (example_backend != null) {
+        std.debug.print("specify an example with -Dexample\n", .{});
+        os.exit(0);
+    } else {
+        std.debug.print(
+            \\use `-Dexample` and `-Dbackend` to build an example with a backend.
+            \\for example: `zig build -Dexample=rectangle -Dbackend=terminal`
             \\
-        , .{}).step);
+        , .{});
+        os.exit(0);
+    }
 }
 
 const list_item_prefix = "∙ ";
 
-fn buildExample(b: *std.build.Builder, mode: std.builtin.Mode, example_name: []const u8, example_backend_name: []const u8) !void {
+fn buildExample(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, example_name: []const u8, example_backend_name: []const u8, wool_module: *Module) !void {
     const example_dir = try std.fs.cwd().openDir("examples", .{});
     // there are two kinds of examples:
     // one has a directory with a main.zig and the other is a standalone file
@@ -88,23 +93,20 @@ fn buildExample(b: *std.build.Builder, mode: std.builtin.Mode, example_name: []c
     };
 
     // this is the backbone that makes the example run
-    const backend_pkg = std.build.Pkg{
-        .name = "backend",
-        .source = .{ .path = try fmt.allocPrint(b.allocator, "examples/backends/{s}/src/main.zig", .{example_backend_name}) },
-    };
+    const backend_module = b.createModule(.{
+        .source_file = .{ .path = try fmt.allocPrint(b.allocator, "examples/backends/{s}/src/main.zig", .{example_backend_name}) },
+    });
 
     // this is the backend-agnostic example that makes use of the backend behind the scenes
-    const example_pkg = std.build.Pkg{
-        .name = "example",
-        .source = .{ .path = example_pkg_path },
-        .dependencies = &.{ wool_pkg, backend_pkg },
-    };
+    const example_module = b.createModule(.{
+        .source_file = .{ .path = example_pkg_path },
+        .dependencies = &.{ .{ .name = "wool", .module = wool_module }, .{ .name = "backend", .module = backend_module } },
+    });
 
-    // this is common code shared across backends only to be used by backends
-    const other_pkg = std.build.Pkg{
-        .name = "other",
-        .source = .{ .path = "examples/backends/other.zig" },
-    };
+    // this is code shared across backends only to be used by backends (internal)
+    const other_module = b.createModule(.{
+        .source_file = .{ .path = "examples/backends/other.zig" },
+    });
 
     // TODO: could these args ever be useful? for example configuration or something? as argv?
     //if (b.args) |args|
@@ -113,17 +115,17 @@ fn buildExample(b: *std.build.Builder, mode: std.builtin.Mode, example_name: []c
     if (std.meta.stringToEnum(ExampleBackend, example_backend_name)) |example_backend| {
         try switch (example_backend) {
             .none => @import("examples/backends/none/build.zig")
-                .build(b, mode, wool_pkg, example_pkg, other_pkg),
+                .build(b, optimize, wool_module, example_module, other_module),
             .opengl => @import("examples/backends/opengl/build.zig")
-                .build(b, mode, wool_pkg, example_pkg, other_pkg),
+                .build(b, optimize, wool_module, example_module, other_module),
             .terminal => @import("examples/backends/terminal/build.zig")
-                .build(b, mode, wool_pkg, example_pkg, other_pkg),
+                .build(b, optimize, wool_module, example_module, other_module),
             .uefi => @import("examples/backends/uefi/build.zig")
-                .build(b, mode, wool_pkg, example_pkg, other_pkg),
+                .build(b, optimize, wool_module, example_module, other_module),
             .vulkan => @panic("todo"), //@import("examples/backends/vulkan/build.zig")
-            //.build(b, mode, wool_pkg, example_pkg, other_pkg),
+            //.build(b, optimize, wool_module, example_module, other_module),
             .web => @import("examples/backends/web/build.zig")
-                .build(b, mode, wool_pkg, example_pkg, other_pkg),
+                .build(b, optimize, wool_module, example_module, other_module),
         };
     } else {
         std.debug.print(

@@ -26,7 +26,7 @@ pub fn BitMap(comptime grid_options: grids.Options, comptime width: comptime_int
 
         /// Uses `content_one` to draw 1-bits and `content_zero` to draw 0-bits.
         pub fn draw(grid: Grid, options: Options, other_grid: anytype, x: isize, y: isize, content_one: anytype, content_zero: anytype) void {
-            for (grid.bit_sets) |bit_set, rel_y| {
+            for (grid.bit_sets, 0..) |bit_set, rel_y| {
                 var offset: std.math.IntFittingRange(0, width) = width;
                 while (offset > 0) : (offset -= 1) {
                     const mask = @as(std.meta.Int(.unsigned, width), 0b1) << offset - 1;

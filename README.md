@@ -9,7 +9,7 @@
 <p align="center">
   <img alt="Ferris" src="demo.png" />
   <p align="center">
-    <i><b>The <a href="examples/metaballs.zig">metaballs</a> example running in the UEFI, on the web, in the terminal, and natively using OpenGL</b></i>
+    <i><b>The <a href="examples/metaballs.zig">metaballs</a> example running in the UEFI (TODO: build.zig broken ATM), on the web, in the terminal, and natively using OpenGL</b></i>
   </p>
 </p>
 
@@ -30,7 +30,7 @@ Run `zig build --help` and see `Project-Specific Options`:
                                none, opengl, terminal, uefi, vulkan, web (default: terminal)
 ```
 
-This means e.g. `zig build run -Dexample=rectangle -Dexample-backend=terminal` will build and run the `examples/rectangle.zig` example in your terminal (Ctrl+C to quit).
+This means e.g. `zig build run -Dexample=rectangle -Dbackend=terminal` will build and run the `examples/rectangle.zig` example in your terminal (Ctrl+C to quit).
 
 ## Goals
 

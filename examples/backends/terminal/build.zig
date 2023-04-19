@@ -1,20 +1,26 @@
 const std = @import("std");
+const Build = std.Build;
+const Module = Build.Module;
 
 pub fn build(
-    b: *std.build.Builder,
-    mode: std.builtin.Mode,
-    wool_pkg: std.build.Pkg,
-    example_pkg: std.build.Pkg,
-    other_pkg: std.build.Pkg,
+    b: *Build.Builder,
+    optimize: std.builtin.OptimizeMode,
+    wool_module: *Module,
+    example_module: *Module,
+    other_module: *Module,
 ) void {
     const target = b.standardTargetOptions(.{});
-    const exe = b.addExecutable("terminal-example", "examples/backends/terminal/src/main.zig");
-    exe.addPackage(wool_pkg);
-    exe.addPackage(example_pkg);
-    exe.addPackage(other_pkg);
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
-    exe.install();
+    const exe = b.addExecutable(.{
+        .name = "terminal-example",
+        .root_source_file = .{ .path = "examples/backends/terminal/src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.addModule("wool", wool_module);
+    exe.addModule("example", example_module);
+    exe.addModule("other", other_module);
+    b.installArtifact(exe);
+    const run_artifact = b.addRunArtifact(exe);
     const run_step = b.step("run", "Run example");
-    run_step.dependOn(&exe.run().step);
+    run_step.dependOn(&run_artifact.step);
 }

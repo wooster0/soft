@@ -95,7 +95,7 @@ pub fn main() Status {
         // now that we collected all available options, we can choose a suitable size.
         // in this example we simply want to a size that's pretty small but not too small either.
         // you can apply more complicated logic.
-        for (sizes) |size, index| {
+        for (sizes, 0..) |size, index| {
             if (size.width >= 256 and size.height >= 256) {
                 if (err(gop.setMode(@intCast(u32, index)))) |status|
                     return status;

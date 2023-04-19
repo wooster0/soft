@@ -5,7 +5,7 @@ const mem = std.mem;
 const builtin = @import("builtin");
 
 const wool = @import("wool");
-const backend = @import("backend");
+const backend = @import("root"); // TODO: https://github.com/ziglang/zig/issues/14708: @import("backend");
 
 const Grid = backend.Grid;
 const grid = &backend.grid;
@@ -47,7 +47,7 @@ pub fn tick(time: anytype) !void {
     try update(backend.allocator);
 
     if (colorful) {
-        for (life.cells()) |*cell, index| {
+        for (life.cells(), 0..) |*cell, index| {
             switch (cell.*) {
                 .live => {
                     const normal = @intToFloat(f32, index) / @intToFloat(f32, grid.width * grid.height);
@@ -64,7 +64,7 @@ pub fn tick(time: anytype) !void {
             }
         }
     } else {
-        for (life.cells()) |*cell, index|
+        for (life.cells(), 0..) |*cell, index|
             grid.cells()[index] = switch (cell.*) {
                 .live => Color.white,
                 .dead => Color.black,
@@ -77,7 +77,7 @@ fn update(allocator: mem.Allocator) !void {
     var new_life = try Life.init(allocator, grid.width, grid.height);
     defer new_life.deinit(allocator);
 
-    for (life.cells()) |cell, index| {
+    for (life.cells(), 0..) |cell, index| {
         const x = @intCast(isize, index % grid.width);
         const y = @intCast(isize, index / grid.width);
         const live_neighbor_count = countLiveNeighbors(x, y);
@@ -98,7 +98,7 @@ fn update(allocator: mem.Allocator) !void {
         }
     }
 
-    for (life.cells()) |*cell, index|
+    for (life.cells(), 0..) |*cell, index|
         cell.* = new_life.cells()[index];
 }
 

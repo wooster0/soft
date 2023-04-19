@@ -210,7 +210,7 @@ fn drawGrid(terminal: *Terminal) !void {
             }
         },
         .custom => |string| {
-            for (grid.cellsSlice()) |color, index| {
+            for (grid.cellsSlice(), 0..) |color, index| {
                 if (color.eql(Color.black)) continue;
 
                 const x = @intCast(u16, index % grid.width);

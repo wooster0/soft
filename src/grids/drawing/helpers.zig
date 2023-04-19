@@ -32,7 +32,7 @@ pub fn DrawingHelpers(comptime Grid: type, comptime options: grids.Options) type
         }
 
         pub fn set(grid: *Grid, x: isize, y: isize, cell: Cell) void {
-            if (grid.getIndex(x, y)) |index|
+            if (getIndex(grid.*, x, y)) |index|
                 grid.cells()[index] = cell;
         }
 
@@ -40,7 +40,7 @@ pub fn DrawingHelpers(comptime Grid: type, comptime options: grids.Options) type
             .clip, .wrap => ?Cell,
             .fast => Cell,
         } {
-            if (grid.getIndex(x, y)) |index|
+            if (getIndex(grid, x, y)) |index|
                 return grid.cellsSlice()[index];
             switch (options.oob_behavior) {
                 .clip, .wrap => return null,

@@ -2,7 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 const wool = @import("wool");
-const backend = @import("backend");
+const backend = @import("root"); // TODO: https://github.com/ziglang/zig/issues/14708: @import("backend");
 
 const Grid = backend.Grid;
 const grid = &backend.grid;
@@ -15,7 +15,7 @@ const more_colors = true;
 
 pub fn tick(time: anytype) !void {
     // TODO(general): make iterating through cells, while having x and y too, nicer
-    for (grid.cells()) |*cell, index| {
+    for (grid.cells(), 0..) |*cell, index| {
         const x = @intCast(u32, index % grid.width);
         const y = @intCast(u32, index / grid.width);
 

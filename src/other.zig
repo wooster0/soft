@@ -48,7 +48,6 @@ pub fn lerp(a: anytype, b: anytype, t: anytype) @TypeOf(a, b, t) {
     return @mulAdd(Type, b - a, t, a);
 }
 
-
 // TODO: pub fn Time(Float: type)
 pub const Time = struct {
     /// Monotonically increasing time.
