@@ -39,6 +39,7 @@ pub fn build(
     wasm.override_dest_dir = .{ .custom = "static" }; // Names I considered for the root dir: static, www, public
     b.installArtifact(wasm);
 
+    // NOTE: in hindsight, I think it's a bad idea to automatically run the webserver like this and the user should be required to run it themselves, especially for development
     var run_webserver_step = try b.allocator.create(std.build.Step);
     const runWebserver = struct {
         fn runWebserver(step: *std.build.Step, progress: *std.Progress.Node) !void {
