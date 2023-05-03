@@ -7,11 +7,9 @@ const other = @import("other");
 export const width: usize = 512;
 export const height: usize = 512;
 
-// TODO: investigate strange freezes in Firefox and Chromium
-
 pub const Grid = wool.StaticGrid(
     .{
-        // make this compatible with Canvas2D and WebGL
+        // This format is compatible with Canvas2D and WebGL.
         .Cell = packed struct {
             r: u8,
             g: u8,

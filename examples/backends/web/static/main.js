@@ -69,11 +69,7 @@ function draw(context, pixels, width, height) {
     } else if (canvasContextType === "webgl" || canvasContextType === "webgl2") {
         const gl = context;
 
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-
         gl.drawArrays(
             gl.TRIANGLES,
             0,
@@ -149,6 +145,10 @@ function getContext(canvas) {
         const positionLocation = gl.getAttribLocation(program, "position");
         gl.enableVertexAttribArray(positionLocation);
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
         return gl;
     } else {
