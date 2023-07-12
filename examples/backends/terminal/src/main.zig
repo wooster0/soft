@@ -123,7 +123,7 @@ const Terminal = struct {
     pub fn getSize(terminal: Terminal) !Size(u16) {
         if (builtin.os.tag == .linux) {
             var winsize: os.linux.winsize = undefined;
-            switch (os.errno(os.linux.ioctl(terminal.stdout.handle, os.linux.T.IOCGWINSZ, @ptrToInt(&winsize)))) {
+            switch (os.errno(os.linux.ioctl(terminal.stdout.handle, os.linux.T.IOCGWINSZ, @intFromPtr(&winsize)))) {
                 .SUCCESS => return .{ .width = winsize.ws_col, .height = winsize.ws_row },
                 else => return error.unexpected,
             }
@@ -131,7 +131,7 @@ const Terminal = struct {
             var info: os.windows.CONSOLE_SCREEN_BUFFER_INFO = undefined;
             if (os.windows.kernel32.GetConsoleScreenBufferInfo(terminal.stdout, &info) != os.windows.TRUE)
                 return error.unexpected;
-            return .{ .width = @intCast(u16, info.dwSize.X), .height = @intCast(u16, info.dwSize.Y) };
+            return .{ .width = @as(u16, @intCast(info.dwSize.X)), .height = @as(u16, @intCast(info.dwSize.Y)) };
         }
     }
 
@@ -175,10 +175,10 @@ fn drawGrid(terminal: *Terminal) !void {
                 else
                     upper_cell;
 
-                const x = @intCast(u16, index % grid.width);
-                const y = @intCast(u16, index / grid.width);
+                const x = @as(u16, @intCast(index % grid.width));
+                const y = @as(u16, @intCast(index / grid.width));
 
-                const lower_color = if (grid.get(@intCast(i16, x), @intCast(i16, y) + 1)) |color_cell|
+                const lower_color = if (grid.get(@as(i16, @intCast(x)), @as(i16, @intCast(y)) + 1)) |color_cell|
                     if (color_cell.eql(Color.black))
                         null
                     else
@@ -213,8 +213,8 @@ fn drawGrid(terminal: *Terminal) !void {
             for (grid.cellsSlice(), 0..) |color, index| {
                 if (color.eql(Color.black)) continue;
 
-                const x = @intCast(u16, index % grid.width);
-                const y = @intCast(u16, index / grid.width);
+                const x = @as(u16, @intCast(index % grid.width));
+                const y = @as(u16, @intCast(index / grid.width));
 
                 // TODO: open an issue? string length should be comptime_int
                 try terminal.setCursorPosition(x * @as(u16, string.width), y);
@@ -309,7 +309,7 @@ fn run() !void {
 
     try setAbortSignalHandler(handleAbortSignal);
 
-    seed = @bitCast(u64, std.time.milliTimestamp());
+    seed = @as(u64, @bitCast(std.time.milliTimestamp()));
 
     try example.init();
 
@@ -328,7 +328,7 @@ fn run() !void {
     var time = wool.Time{};
 
     while (true) {
-        time.update(@intToFloat(f64, std.time.milliTimestamp()));
+        time.update(@as(f64, @floatFromInt(std.time.milliTimestamp())));
         if (time.getFPSSleep(60)) |ns|
             std.time.sleep(ns);
 

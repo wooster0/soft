@@ -16,8 +16,8 @@ pub fn build(
     //       wouldn't it be good if we could turn on all features?
     // Enabling bulk memory operations and SIMD can significantly improve performance.
     var features = std.Target.Cpu.Feature.Set.empty;
-    features.addFeature(@enumToInt(std.Target.wasm.Feature.bulk_memory));
-    features.addFeature(@enumToInt(std.Target.wasm.Feature.simd128));
+    features.addFeature(@intFromEnum(std.Target.wasm.Feature.bulk_memory));
+    features.addFeature(@intFromEnum(std.Target.wasm.Feature.simd128));
     const wasm = b.addSharedLibrary(.{
         .name = "web-example",
         .root_source_file = .{ .path = "examples/backends/web/src/main.zig" },
@@ -34,8 +34,8 @@ pub fn build(
     wasm.single_threaded = true;
     wasm.rdynamic = true; // Include exports in binary.
     const dest_path = thisDir();
-    b.install_prefix = dest_path; 
-    b.install_path = dest_path; 
+    b.install_prefix = dest_path;
+    b.install_path = dest_path;
     wasm.override_dest_dir = .{ .custom = "static" }; // Names I considered for the root dir: static, www, public
     b.installArtifact(wasm);
 

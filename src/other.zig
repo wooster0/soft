@@ -80,7 +80,7 @@ pub const Time = struct {
     pub fn getFPSSleep(time: Time, fps: f64) ?u64 {
         const fraction: f64 = 1.0 / fps;
         if (time.delta < fraction)
-            return @floatToInt(u64, std.time.ns_per_s * (fraction - time.delta))
+            return @intFromFloat(std.time.ns_per_s * (fraction - time.delta))
         else
             return null;
     }
@@ -91,9 +91,9 @@ pub const Time = struct {
     pub fn mul(time: Time, value: anytype, factor: f64) @TypeOf(value) {
         const Type = @TypeOf(value);
         comptime if (std.meta.trait.isIntegral(Type)) {
-            return @floatToInt(Type, @intToFloat(f64, value) * time.delta * factor);
+            return @intFromFloat(@as(f64, @floatFromInt(value)) * time.delta * factor);
         } else if (std.meta.trait.isFloat(Type)) {
-            return @floatCast(Type, @floatCast(f64, value) * time.delta * factor);
+            return @floatCast(@as(f64, @floatCast(value)) * time.delta * factor);
         };
     }
 };

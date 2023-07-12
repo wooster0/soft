@@ -14,7 +14,7 @@ pub fn DrawingHelpers(comptime Grid: type, comptime options: grids.Options) type
             if (x < 0 or y < 0)
                 return null;
 
-            const index = @intCast(usize, x) + @intCast(usize, y) * grid.width;
+            const index = @as(usize, @intCast(x)) + @as(usize, @intCast(y)) * grid.width;
 
             switch (options.oob_behavior) {
                 .clip => {

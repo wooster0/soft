@@ -85,8 +85,8 @@ pub fn init(logical_device: c.VkDevice, swap_chain_extent: c.VkExtent2D, swap_ch
     const viewport = c.VkViewport{
         .x = 0.0,
         .y = 0.0,
-        .width = @intToFloat(f32, swap_chain_extent.width),
-        .height = @intToFloat(f32, swap_chain_extent.height),
+        .width = @as(f32, @floatFromInt(swap_chain_extent.width)),
+        .height = @as(f32, @floatFromInt(swap_chain_extent.height)),
         .minDepth = 0.0,
         .maxDepth = 1.0,
     };
@@ -211,7 +211,7 @@ fn createShaderModule(physical_device: c.VkDevice, bytes: []align(4) const u8) c
     var create_info = mem.zeroInit(c.VkShaderModuleCreateInfo, .{
         .sType = c.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         .codeSize = bytes.len,
-        .pCode = @ptrCast([*c]const u32, bytes),
+        .pCode = @as([*c]const u32, @ptrCast(bytes)),
     });
     var shader_module: c.VkShaderModule = undefined;
     if (c.vkCreateShaderModule(physical_device, &create_info, null, &shader_module) != c.VK_SUCCESS)

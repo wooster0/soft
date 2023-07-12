@@ -38,7 +38,7 @@ var time = wool.Time{};
 extern fn @"Math.random"() f64;
 
 export fn init() void {
-    seed = @bitCast(u64, @"Math.random"());
+    seed = @as(u64, @bitCast(@"Math.random"()));
     example.init() catch unreachable;
 }
 
@@ -59,14 +59,14 @@ export fn tick(now_ms: f64) void {
 
 export fn onmousemove(x: f64, y: f64) void {
     if (@hasDecl(example, "handlePointerMovement"))
-        example.handlePointerMovement(@floatToInt(isize, x), @floatToInt(isize, y));
+        example.handlePointerMovement(@as(isize, @intFromFloat(x)), @as(isize, @intFromFloat(y)));
 }
 
 export fn onmousedown(x: f64, y: f64) void {
     if (@hasDecl(example, "handlePointerPressed"))
-        example.handlePointerPressed(@floatToInt(isize, x), @floatToInt(isize, y));
+        example.handlePointerPressed(@as(isize, @intFromFloat(x)), @as(isize, @intFromFloat(y)));
 }
 export fn onmouseup(x: f64, y: f64) void {
     if (@hasDecl(example, "handlePointerReleased"))
-        example.handlePointerReleased(@floatToInt(isize, x), @floatToInt(isize, y));
+        example.handlePointerReleased(@as(isize, @intFromFloat(x)), @as(isize, @intFromFloat(y)));
 }

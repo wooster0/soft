@@ -16,30 +16,30 @@ const more_colors = true;
 pub fn tick(time: anytype) !void {
     // TODO(general): make iterating through cells, while having x and y too, nicer
     for (grid.cells(), 0..) |*cell, index| {
-        const x = @intCast(u32, index % grid.width);
-        const y = @intCast(u32, index / grid.width);
+        const x = @as(u32, @intCast(index % grid.width));
+        const y = @as(u32, @intCast(index / grid.width));
 
         if (more_colors)
-            cell.* = @bitCast(Color, @truncate(
+            cell.* = @as(Color, @bitCast(@as(
                 u24,
                 // try other bitwise operations like `&`, `|`, or `^`
-                // |    |
-                // |    |
-                // v    v
-                (x ^ y) | @bitCast(
+                //           |    |
+                //           |    |
+                //           v    v
+                @truncate((x ^ y) | @as(
                     u24,
-                    Color.rgb(
+                    @bitCast(Color.rgb(
                         @fabs(@sin(time.elapsed)),
-                        @intToFloat(f32, x * y) / @intToFloat(f32, grid.width * grid.height),
+                        @as(f32, @floatFromInt(x * y)) / @as(f32, @floatFromInt(grid.width * grid.height)),
                         @fabs(@cos(time.elapsed)),
-                    ),
-                ),
-            ))
+                    )),
+                )),
+            )))
         else
-            cell.* = @bitCast(Color, @truncate(
+            cell.* = @as(Color, @bitCast(@as(
                 u24,
                 // try other bitwise operations like `&`, `|`, or `^`
-                x | y,
-            ));
+                @truncate(x | y),
+            )));
     }
 }

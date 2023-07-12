@@ -92,7 +92,7 @@ fn createInstance(use_validation_layers: bool) !c.VkInstance {
         // these specify the global extensions
         .enabledExtensionCount = glfw_extension_count,
         .ppEnabledExtensionNames = glfw_extensions,
-        .enabledLayerCount = @boolToInt(use_validation_layers),
+        .enabledLayerCount = @intFromBool(use_validation_layers),
         .ppEnabledLayerNames = @as(
             [*c]const [*c]const u8,
             if (use_validation_layers) &[_][*c]const u8{VK_LAYER_KHRONOS_validation} else null,
@@ -223,13 +223,13 @@ const QueueFamilyIndices = struct {
         for (queue_families, 0..) |queue_family, index| {
             // std.debug.print("index: {d} 2: {d}\n", .{index, index2});
             if (queue_family.queueFlags & c.VK_QUEUE_GRAPHICS_BIT == 1)
-                queue_family_indices.graphics_family = @intCast(u32, index);
+                queue_family_indices.graphics_family = @as(u32, @intCast(index));
 
             var presentation_support: c.VkBool32 = undefined;
-            if (c.vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, @intCast(u32, index), surface, &presentation_support) != c.VK_SUCCESS)
+            if (c.vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, @as(u32, @intCast(index)), surface, &presentation_support) != c.VK_SUCCESS)
                 @panic("failed getting Vulkan physical device surface support");
             if (presentation_support == 1)
-                queue_family_indices.presentation_family = @intCast(u32, index);
+                queue_family_indices.presentation_family = @as(u32, @intCast(index));
 
             std.debug.print("complete? {}\n", .{queue_family_indices.isComplete()});
 
@@ -289,7 +289,7 @@ fn createLogicalDeviceAndQueues(
         // a previous version of the Vulkan spec made a distinction of instance-specific
         // and device-specific validation layers. while this is no longer the case, to be compatible with
         // older implementations of Vulkan, we'll explicitly set validation layers for this device, anyway.
-        .enabledLayerCount = @boolToInt(use_validation_layers),
+        .enabledLayerCount = @intFromBool(use_validation_layers),
         .ppEnabledLayerNames = @as(
             [*c]const [*c]const u8,
             if (use_validation_layers) &[_][*c]const u8{VK_LAYER_KHRONOS_validation} else null,
@@ -386,12 +386,12 @@ const SwapChainSupportDetails = struct {
 
             const actual_extent = c.VkExtent2D{
                 .width = math.clamp(
-                    @intCast(u32, width),
+                    @as(u32, @intCast(width)),
                     details.capabilities.minImageExtent.width,
                     details.capabilities.maxImageExtent.width,
                 ),
                 .height = math.clamp(
-                    @intCast(u32, height),
+                    @as(u32, @intCast(height)),
                     details.capabilities.minImageExtent.height,
                     details.capabilities.maxImageExtent.height,
                 ),

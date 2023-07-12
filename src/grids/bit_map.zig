@@ -30,12 +30,12 @@ pub fn BitMap(comptime grid_options: grids.Options, comptime width: comptime_int
                 var offset: std.math.IntFittingRange(0, width) = width;
                 while (offset > 0) : (offset -= 1) {
                     const mask = @as(std.meta.Int(.unsigned, width), 0b1) << offset - 1;
-                    const bit = @boolToInt(bit_set & mask == mask);
+                    const bit = @intFromBool(bit_set & mask == mask);
 
-                    const rel_x = @intCast(isize, width - offset);
+                    const rel_x = @as(isize, @intCast(width - offset));
 
                     const abs_x = x + rel_x;
-                    const abs_y = y + @intCast(isize, rel_y);
+                    const abs_y = y + @as(isize, @intCast(rel_y));
 
                     const maybe_content = switch (bit) {
                         0 => content_zero,

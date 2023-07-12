@@ -26,7 +26,7 @@ pub fn init() !void {
     var prng = std.rand.DefaultPrng.init(backend.seed);
     const random = prng.random();
     for (life.cells()) |*cell|
-        cell.* = @intToEnum(Life.Cell, @boolToInt(random.boolean()));
+        cell.* = @as(Life.Cell, @enumFromInt(@intFromBool(random.boolean())));
 
     // block (still life)
     life.set(1, 1, .live);
@@ -50,7 +50,7 @@ pub fn tick(time: anytype) !void {
         for (life.cells(), 0..) |*cell, index| {
             switch (cell.*) {
                 .live => {
-                    const normal = @intToFloat(f32, index) / @intToFloat(f32, grid.width * grid.height);
+                    const normal = @as(f32, @floatFromInt(index)) / @as(f32, @floatFromInt(grid.width * grid.height));
                     const color = Color.rgb(
                         @fabs(@sin(time.elapsed)),
                         @fabs(@cos(normal)),
@@ -78,8 +78,8 @@ fn update(allocator: mem.Allocator) !void {
     defer new_life.deinit(allocator);
 
     for (life.cells(), 0..) |cell, index| {
-        const x = @intCast(isize, index % grid.width);
-        const y = @intCast(isize, index / grid.width);
+        const x = @as(isize, @intCast(index % grid.width));
+        const y = @as(isize, @intCast(index / grid.width));
         const live_neighbor_count = countLiveNeighbors(x, y);
 
         switch (cell) {

@@ -16,8 +16,8 @@ pub fn tick(time: anytype) !void {
     grid.drawRectangle(
         0,
         0,
-        @intCast(isize, grid.width),
-        @intCast(isize, grid.height),
+        @as(isize, @intCast(grid.width)),
+        @as(isize, @intCast(grid.height)),
         Color.verticalGradient(Color.red, Color.green),
     );
 }

@@ -50,8 +50,8 @@ var resize: ?wool.Size(usize) = null;
 fn windowSizeCallback(window: ?*c.GLFWwindow, width: c_int, height: c_int) callconv(.C) void {
     _ = window;
     resize = .{
-        .width = @intCast(c_uint, width),
-        .height = @intCast(c_uint, height),
+        .width = @as(c_uint, @intCast(width)),
+        .height = @as(c_uint, @intCast(height)),
     };
 }
 
@@ -74,14 +74,14 @@ pub fn main() !void {
     grid = try Grid.init(allocator, initial_window_size, initial_window_size);
     defer grid.deinit(allocator);
 
-    seed = @bitCast(u64, std.time.milliTimestamp());
+    seed = @as(u64, @bitCast(std.time.milliTimestamp()));
 
     try example.init();
 
     var time = wool.Time{};
 
     while (c.glfwWindowShouldClose(window) == c.GLFW_FALSE) {
-        time.update(@intToFloat(f64, std.time.milliTimestamp()));
+        time.update(@as(f64, @floatFromInt(std.time.milliTimestamp())));
 
         // no sleep needed: we rely VSync to run the example at a reasonable speed
 
@@ -90,7 +90,7 @@ pub fn main() !void {
             // TODO: dynamically resize the grid:
             //       try grid.resize(allocator, size.width, size.height);
 
-            c.glViewport(0, 0, @intCast(c_int, size.width), @intCast(c_int, size.height));
+            c.glViewport(0, 0, @as(c_int, @intCast(size.width)), @as(c_int, @intCast(size.height)));
 
             resize = null;
         }
@@ -125,10 +125,10 @@ fn draw() void {
     c.glRasterPos2i(-1, 1);
     c.glPixelZoom(1, -1);
     c.glDrawPixels(
-        @intCast(c_int, grid.width),
-        @intCast(c_int, grid.height),
+        @as(c_int, @intCast(grid.width)),
+        @as(c_int, @intCast(grid.height)),
         c.GL_RGB,
         c.GL_UNSIGNED_BYTE,
-        @ptrCast(?*const anyopaque, grid.cells()),
+        @as(?*const anyopaque, @ptrCast(grid.cells())),
     );
 }

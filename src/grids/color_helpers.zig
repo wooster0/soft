@@ -44,9 +44,9 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
             _ = fmt;
             _ = format_options;
             return writer.print("Color{{{d}, {d}, {d}}}", .{
-                @intToFloat(f32, color.r) / 255,
-                @intToFloat(f32, color.g) / 255,
-                @intToFloat(f32, color.b) / 255,
+                @as(f32, @floatFromInt(color.r)) / 255,
+                @as(f32, @floatFromInt(color.g)) / 255,
+                @as(f32, @floatFromInt(color.b)) / 255,
             });
         }
 
@@ -83,15 +83,15 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
             assert(blue >= 0 and blue <= 1);
             if (options.round) {
                 return .{
-                    .r = @floatToInt(u8, @round(red * 255.0)),
-                    .g = @floatToInt(u8, @round(green * 255.0)),
-                    .b = @floatToInt(u8, @round(blue * 255.0)),
+                    .r = @as(u8, @intFromFloat(@round(red * 255.0))),
+                    .g = @as(u8, @intFromFloat(@round(green * 255.0))),
+                    .b = @as(u8, @intFromFloat(@round(blue * 255.0))),
                 };
             } else {
                 return .{
-                    .r = @floatToInt(u8, red * 255),
-                    .g = @floatToInt(u8, green * 255),
-                    .b = @floatToInt(u8, blue * 255),
+                    .r = @as(u8, @intFromFloat(red * 255)),
+                    .g = @as(u8, @intFromFloat(green * 255)),
+                    .b = @as(u8, @intFromFloat(blue * 255)),
                 };
             }
         }
@@ -125,7 +125,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
             assert(s >= 0 and s <= 1);
             assert(l >= 0 and l <= 1);
 
-            const a = s * math.min(l, 1 - l);
+            const a = s * @min(l, 1 - l);
             return rgb(
                 getHSLComponent(0, h, l, a),
                 getHSLComponent(8, h, l, a),
@@ -134,7 +134,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
         }
         fn getHSLComponent(n: f32, h: f32, l: f32, a: f32) f32 {
             const k = @rem(n + h / 30, 12);
-            return l - a * math.max(math.min3(k - 3, 9 - k, 1), -1);
+            return l - a * @max(@min(k - 3, 9 - k, 1), -1);
         }
 
         const coloring = struct {
@@ -159,14 +159,14 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                         switch (options.color_interpolation) {
                             .rgb => {
                                 const result = lerp(
-                                    @Vector(3, f32){ @intToFloat(f32, from.r), @intToFloat(f32, from.g), @intToFloat(f32, from.b) },
-                                    @Vector(3, f32){ @intToFloat(f32, to.r), @intToFloat(f32, to.g), @intToFloat(f32, to.b) },
+                                    @Vector(3, f32){ @as(f32, @floatFromInt(from.r)), @as(f32, @floatFromInt(from.g)), @as(f32, @floatFromInt(from.b)) },
+                                    @Vector(3, f32){ @as(f32, @floatFromInt(to.r)), @as(f32, @floatFromInt(to.g)), @as(f32, @floatFromInt(to.b)) },
                                     @Vector(3, f32){ x, x, x },
                                 );
                                 return Color{
-                                    .r = @floatToInt(u8, result[0]),
-                                    .g = @floatToInt(u8, result[1]),
-                                    .b = @floatToInt(u8, result[2]),
+                                    .r = @as(u8, @intFromFloat(result[0])),
+                                    .g = @as(u8, @intFromFloat(result[1])),
+                                    .b = @as(u8, @intFromFloat(result[2])),
                                 };
                             },
                             .hsv => {
@@ -195,14 +195,14 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                         switch (options.color_interpolation) {
                             .rgb => {
                                 const result = lerp(
-                                    @Vector(3, f32){ @intToFloat(f32, from.r), @intToFloat(f32, from.g), @intToFloat(f32, from.b) },
-                                    @Vector(3, f32){ @intToFloat(f32, to.r), @intToFloat(f32, to.g), @intToFloat(f32, to.b) },
+                                    @Vector(3, f32){ @as(f32, @floatFromInt(from.r)), @as(f32, @floatFromInt(from.g)), @as(f32, @floatFromInt(from.b)) },
+                                    @Vector(3, f32){ @as(f32, @floatFromInt(to.r)), @as(f32, @floatFromInt(to.g)), @as(f32, @floatFromInt(to.b)) },
                                     @Vector(3, f32){ y, y, y },
                                 );
                                 return Color{
-                                    .r = @floatToInt(u8, result[0]),
-                                    .g = @floatToInt(u8, result[1]),
-                                    .b = @floatToInt(u8, result[2]),
+                                    .r = @as(u8, @intFromFloat(result[0])),
+                                    .g = @as(u8, @intFromFloat(result[1])),
+                                    .b = @as(u8, @intFromFloat(result[2])),
                                 };
                             },
                             .hsv => {
@@ -241,9 +241,9 @@ fn HSV(comptime Float: type) type {
 }
 
 pub fn rgbToHsv(comptime Cell: type, comptime Float: type, rgb: grids.Color(Cell)) HSV(Float) {
-    const r = @intToFloat(Float, rgb.r) / 255;
-    const g = @intToFloat(Float, rgb.g) / 255;
-    const b = @intToFloat(Float, rgb.b) / 255;
+    const r = @as(Float, @floatFromInt(rgb.r)) / 255;
+    const g = @as(Float, @floatFromInt(rgb.g)) / 255;
+    const b = @as(Float, @floatFromInt(rgb.b)) / 255;
 
     const max = math.max3(r, g, b);
     const min = math.min3(r, g, b);
@@ -290,8 +290,8 @@ pub fn hsvToRgb(comptime Cell: type, comptime Float: type, hsv: HSV(Float)) grid
         return Color.rgb(v, v, v);
 
     const hueNorm = h / 360;
-    const i = @floatToInt(u8, hueNorm * 6);
-    const f = hueNorm * 6 - @intToFloat(f32, i);
+    const i = @as(u8, @intFromFloat(hueNorm * 6));
+    const f = hueNorm * 6 - @as(f32, @floatFromInt(i));
     const p = v * (1 - s);
     const q = v * (1 - (s * f));
     const t = v * (1 - (s * (1 - f)));
@@ -318,9 +318,9 @@ const tests = struct {
 
     // this accomodates for rounding errors
     fn expectApproxEq(expected: Color, actual: Color) !void {
-        try testing.expectApproxEqAbs(@intToFloat(f32, expected.r), @intToFloat(f32, actual.r), 1);
-        try testing.expectApproxEqAbs(@intToFloat(f32, expected.g), @intToFloat(f32, actual.g), 1);
-        try testing.expectApproxEqAbs(@intToFloat(f32, expected.b), @intToFloat(f32, actual.b), 1);
+        try testing.expectApproxEqAbs(@as(f32, @floatFromInt(expected.r)), @as(f32, @floatFromInt(actual.r)), 1);
+        try testing.expectApproxEqAbs(@as(f32, @floatFromInt(expected.g)), @as(f32, @floatFromInt(actual.g)), 1);
+        try testing.expectApproxEqAbs(@as(f32, @floatFromInt(expected.b)), @as(f32, @floatFromInt(actual.b)), 1);
     }
 
     test "RGB colors" {

@@ -45,7 +45,7 @@ pub fn run(dir_path: []const u8) !void {
             log.err("failed checking that dir path points to dir: {s}", .{@errorName(err)});
             return error.Error;
         };
-        if (stat.kind != .Directory) {
+        if (stat.kind != .directory) {
             log.err("dir path does not point to dir: {s}", .{trimmed_dir_path});
             return error.Error;
         }
@@ -57,12 +57,12 @@ pub fn run(dir_path: []const u8) !void {
         .reuse_address = true,
     });
 
-    stream_server.listen(net.Address.initIp4(.{ 127, 0, 0, 1 }, 8080)) catch |err| {
-        log.err("failed listening at localhost:8080: {s}", .{@errorName(err)});
+    stream_server.listen(net.Address.initIp4(.{ 127, 0, 0, 1 }, 2020)) catch |err| {
+        log.err("failed listening at localhost:2020: {s}", .{@errorName(err)});
         return error.Error;
     };
 
-    log.info("open <http://localhost:8080/> in your browser", .{});
+    log.info("open <http://localhost:2020/> in your browser", .{});
 
     while (true) {
         const connection = stream_server.accept() catch |err| {

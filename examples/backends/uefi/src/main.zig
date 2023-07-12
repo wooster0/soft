@@ -39,9 +39,9 @@ fn getMilliseconds() !f64 {
         // so `timestamp.nanosecond` will likely always be zero.
         // in this case we regard the UEFI's capability of reporting the nanosecond
         // as broken so we will use the next best thing we can.
-        @intToFloat(f64, timestamp.second) * std.time.ms_per_s
+        @as(f64, @floatFromInt(timestamp.second)) * std.time.ms_per_s
     else
-        @intToFloat(f64, timestamp.nanosecond) / std.time.ns_per_ms;
+        @as(f64, @floatFromInt(timestamp.nanosecond)) / std.time.ns_per_ms;
 }
 
 fn err(status: Status) ?Status {
@@ -58,7 +58,7 @@ pub fn main() Status {
     if (err(boot_services.locateProtocol(
         &uefi.protocols.GraphicsOutputProtocol.guid,
         null,
-        @ptrCast(*?*anyopaque, &gop),
+        @as(*?*anyopaque, @ptrCast(&gop)),
     ))) |status| return status;
 
     // TODO: https://stackoverflow.com/questions/38979567/efi-graphics-output-protocol-blt-doesnt-do-anything
@@ -67,7 +67,7 @@ pub fn main() Status {
     // turn off the 5-minute timeout that would cause the system to reset.
     if (err(boot_services.setWatchdogTimer(0, 0, 0, null))) |status| return status;
 
-    grid.cellsPtr = @intToPtr([*]Color, gop.mode.frame_buffer_base);
+    grid.cellsPtr = @as([*]Color, @ptrFromInt(gop.mode.frame_buffer_base));
     grid.width = gop.mode.info.horizontal_resolution;
     grid.height = gop.mode.info.vertical_resolution;
 
@@ -97,7 +97,7 @@ pub fn main() Status {
         // you can apply more complicated logic.
         for (sizes, 0..) |size, index| {
             if (size.width >= 256 and size.height >= 256) {
-                if (err(gop.setMode(@intCast(u32, index)))) |status|
+                if (err(gop.setMode(@as(u32, @intCast(index))))) |status|
                     return status;
                 break;
             }
@@ -106,7 +106,7 @@ pub fn main() Status {
 
     _ = gop.setMode(1);
 
-    seed = @bitCast(u64, getMilliseconds() catch 0);
+    seed = @as(u64, @bitCast(getMilliseconds() catch 0));
 
     example.init() catch unreachable;
 
@@ -131,9 +131,9 @@ pub fn main() Status {
         // 1.: @memcpy(@intToPtr([*]u8, gop.mode.frame_buffer_base), @ptrCast([*]u8, grid.cells()), grid.len() * @sizeOf(Color));
         // 2.:
         if (err(
-            gop.blt(@ptrCast(
+            gop.blt(@as(
                 [*]uefi.protocols.GraphicsOutputBltPixel,
-                back_buffer.cellsPtr,
+                @ptrCast(back_buffer.cellsPtr),
             ), .BltBufferToVideo, 0, 0, 0, 0, grid.width, grid.height, 0),
         )) |status| return status;
     }

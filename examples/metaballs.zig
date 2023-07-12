@@ -32,8 +32,8 @@ pub fn init() !void {
     var prng = std.rand.DefaultPrng.init(backend.seed);
     const random = prng.random();
     for (&balls) |*ball| {
-        ball.x = random.intRangeAtMost(isize, 0, @intCast(isize, grid.width));
-        ball.y = random.intRangeAtMost(isize, 0, @intCast(isize, grid.height));
+        ball.x = random.intRangeAtMost(isize, 0, @as(isize, @intCast(grid.width)));
+        ball.y = random.intRangeAtMost(isize, 0, @as(isize, @intCast(grid.height)));
         ball.dx = if (random.boolean()) -1 else 1;
         ball.dy = if (random.boolean()) -1 else 1;
     }
@@ -56,9 +56,9 @@ pub fn tick(time: anytype) !void {
     const fluctuation = 15;
     const fluctuation_speed = 5;
 
-    const size = @intToFloat(f32, grid.width * grid.height);
-    const current_ball_threshold = @floatCast(f32, (ball_threshold + @sin(time.elapsed * fluctuation_speed) * fluctuation) / size);
-    const current_ball_border_radius = @floatCast(f32, (ball_border_radius + @sin(time.elapsed * fluctuation_speed) * fluctuation) / size);
+    const size = @as(f32, @floatFromInt(grid.width * grid.height));
+    const current_ball_threshold = @as(f32, @floatCast((ball_threshold + @sin(time.elapsed * fluctuation_speed) * fluctuation) / size));
+    const current_ball_border_radius = @as(f32, @floatCast((ball_border_radius + @sin(time.elapsed * fluctuation_speed) * fluctuation) / size));
 
     var x: isize = 0;
     while (x < grid.width) : (x += 1) {
@@ -66,9 +66,9 @@ pub fn tick(time: anytype) !void {
         while (y < grid.height) : (y += 1) {
             var sum: f32 = 0;
             for (balls) |ball| {
-                sum += 1 / @intToFloat(
+                sum += 1 / @as(
                     f32,
-                    (x - ball.x) * (x - ball.x) + (y - ball.y) * (y - ball.y),
+                    @floatFromInt((x - ball.x) * (x - ball.x) + (y - ball.y) * (y - ball.y)),
                 );
             }
 
@@ -82,8 +82,8 @@ pub fn tick(time: anytype) !void {
                     x,
                     y,
                     Color.rgb(
-                        @intToFloat(f32, x) / @intToFloat(f32, grid.width),
-                        @intToFloat(f32, y) / @intToFloat(f32, grid.height),
+                        @as(f32, @floatFromInt(x)) / @as(f32, @floatFromInt(grid.width)),
+                        @as(f32, @floatFromInt(y)) / @as(f32, @floatFromInt(grid.height)),
                         @fabs(@sin(time.elapsed)),
                     ),
                 );

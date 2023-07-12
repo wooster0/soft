@@ -768,8 +768,8 @@ pub fn Text(comptime Grid: type, comptime grid_options: grids.Options) type {
         fn getCell(content: Grid.Content, x: usize, y: usize, width: usize, height: usize) Cell {
             // normalize so that our callee doesn't have to think about size
             return content(
-                @intToFloat(grid_options.Float, x) / @intToFloat(grid_options.Float, width),
-                @intToFloat(grid_options.Float, y) / @intToFloat(grid_options.Float, height),
+                @as(grid_options.Float, @floatFromInt(x)) / @as(grid_options.Float, @floatFromInt(width)),
+                @as(grid_options.Float, @floatFromInt(y)) / @as(grid_options.Float, @floatFromInt(height)),
             );
         }
 
@@ -834,8 +834,8 @@ pub fn Text(comptime Grid: type, comptime grid_options: grids.Options) type {
                         bit_map.draw(
                             .{ .scale_x = options.scale_x, .scale_y = options.scale_y },
                             context.grid,
-                            context.x + @intCast(isize, context.offset_x) * (options.charset.width + options.gap),
-                            context.y + @intCast(isize, context.offset_y) * (options.charset.height + options.gap),
+                            context.x + @as(isize, @intCast(context.offset_x)) * (options.charset.width + options.gap),
+                            context.y + @as(isize, @intCast(context.offset_y)) * (options.charset.height + options.gap),
                             @as(?Grid.Content, context.content),
                             @as(?Grid.Content, null),
                         );

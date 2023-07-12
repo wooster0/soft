@@ -156,13 +156,13 @@ fn listExamples(non_existent_example_name: []const u8) !void {
     var dir_entries = iterable_example_dir.iterate();
     while (try dir_entries.next()) |dir_entry| {
         switch (dir_entry.kind) {
-            .Directory => {
+            .directory => {
                 if (mem.eql(u8, dir_entry.name, "backends"))
                     // this is an implementation detail
                     continue;
                 std.debug.print("{s}{s}\n", .{ list_item_prefix, dir_entry.name });
             },
-            .File => {
+            .file => {
                 if (mem.eql(u8, dir_entry.name, "README.md"))
                     // this is documentation
                     continue;

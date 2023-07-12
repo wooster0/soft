@@ -19,8 +19,8 @@ pub fn Shapes(comptime Grid: type, comptime options: grids.Options) type {
         fn getCell(content: Grid.Content, x: isize, y: isize, width: usize, height: usize) Cell {
             // normalize so that our callee doesn't have to think about size
             return content(
-                @intToFloat(f32, x) / @intToFloat(f32, width),
-                @intToFloat(f32, y) / @intToFloat(f32, height),
+                @as(f32, @floatFromInt(x)) / @as(f32, @floatFromInt(width)),
+                @as(f32, @floatFromInt(y)) / @as(f32, @floatFromInt(height)),
             );
         }
 
@@ -52,9 +52,9 @@ pub fn Shapes(comptime Grid: type, comptime options: grids.Options) type {
             const width = math.absCast(to_x - from_x);
             const height = math.absCast(to_y - from_y);
 
-            const dx = @intCast(isize, width);
+            const dx = @as(isize, @intCast(width));
             const sx: i2 = if (from_x < to_x) 1 else -1;
-            const dy = -@intCast(isize, height);
+            const dy = -@as(isize, @intCast(height));
             const sy: i2 = if (from_y < to_y) 1 else -1;
             var err = dx + dy;
 
