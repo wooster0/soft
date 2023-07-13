@@ -17,7 +17,6 @@ const assert = std.debug.assert;
 
 const grids = @import("../grids.zig");
 const other = @import("../other.zig");
-const lerp = other.lerp;
 
 const Options = struct {
     /// Whether to round or not.
@@ -158,7 +157,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                         _ = y;
                         switch (options.color_interpolation) {
                             .rgb => {
-                                const result = lerp(
+                                const result = math.lerp(
                                     @Vector(3, f32){ @as(f32, @floatFromInt(from.r)), @as(f32, @floatFromInt(from.g)), @as(f32, @floatFromInt(from.b)) },
                                     @Vector(3, f32){ @as(f32, @floatFromInt(to.r)), @as(f32, @floatFromInt(to.g)), @as(f32, @floatFromInt(to.b)) },
                                     @Vector(3, f32){ x, x, x },
@@ -172,7 +171,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                             .hsv => {
                                 const from_hsv = rgbToHsv(Color, f32, from);
                                 const to_hsv = rgbToHsv(Color, f32, to);
-                                const result = lerp(
+                                const result = math.lerp(
                                     @Vector(3, f32){ from_hsv.h, from_hsv.s, from_hsv.v },
                                     @Vector(3, f32){ to_hsv.h, to_hsv.s, to_hsv.v },
                                     @Vector(3, f32){ x, x, x },
@@ -194,7 +193,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                         _ = x;
                         switch (options.color_interpolation) {
                             .rgb => {
-                                const result = lerp(
+                                const result = math.lerp(
                                     @Vector(3, f32){ @as(f32, @floatFromInt(from.r)), @as(f32, @floatFromInt(from.g)), @as(f32, @floatFromInt(from.b)) },
                                     @Vector(3, f32){ @as(f32, @floatFromInt(to.r)), @as(f32, @floatFromInt(to.g)), @as(f32, @floatFromInt(to.b)) },
                                     @Vector(3, f32){ y, y, y },
@@ -208,7 +207,7 @@ pub fn ColorHelpers(comptime Cell: type, comptime options: Options) type {
                             .hsv => {
                                 const from_hsv = rgbToHsv(Color, f32, from);
                                 const to_hsv = rgbToHsv(Color, f32, to);
-                                const result = lerp(
+                                const result = math.lerp(
                                     @Vector(3, f32){ from_hsv.h, from_hsv.s, from_hsv.v },
                                     @Vector(3, f32){ to_hsv.h, to_hsv.s, to_hsv.v },
                                     @Vector(3, f32){ y, y, y },
