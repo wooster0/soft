@@ -67,6 +67,11 @@ This means e.g. `zig build run -Dexample=rectangle -Dbackend=terminal` will buil
 * A GPU may not be available
 * You know exactly what's happening
 
+## How is there an OpenGL and a Vulkan backend if "the GPU is not used"?
+
+To clarify, these two backends only take a bunch of CPU-rendered pixels (a texture) and display that on the screen.
+That is the only purpose all the backends serve. The main work of creating those pixels is done by Soft itself.
+
 ## FAQ
 
 ### Question
