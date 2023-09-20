@@ -127,7 +127,7 @@ pub fn init(logical_device: c.VkDevice, swap_chain_extent: c.VkExtent2D, swap_ch
         .blendEnable = c.VK_FALSE,
     });
 
-    // TODO: for reference, this is how you can implement color blending in Wool:
+    // TODO: for reference, this is how you can implement color blending in Soft:
     // if (blendEnable) {
     //     finalColor.rgb = (srcColorBlendFactor * newColor.rgb) <colorBlendOp> (dstColorBlendFactor * oldColor.rgb);
     //     finalColor.a = (srcAlphaBlendFactor * newColor.a) <alphaBlendOp> (dstAlphaBlendFactor * oldColor.a);

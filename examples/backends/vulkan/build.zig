@@ -6,7 +6,7 @@ const Module = Build.Module;
 pub fn build(
     b: *Build.Builder,
     optimize: std.builtin.OptimizeMode,
-    wool_module: *Module,
+    soft_module: *Module,
     example_module: *Module,
     other_module: *Module,
 ) void {
@@ -17,7 +17,7 @@ pub fn build(
         .optimize = optimize,
         .target = target,
     });
-    exe.addModule("wool", wool_module);
+    exe.addModule("soft", soft_module);
     exe.addModule("example", example_module);
     exe.addModule("other", other_module);
     b.installArtifact(exe);

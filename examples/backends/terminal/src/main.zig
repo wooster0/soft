@@ -6,19 +6,19 @@ const fmt = std.fmt;
 const ascii = std.ascii;
 const assert = std.debug.assert;
 
-const wool = @import("wool");
+const soft = @import("soft");
 const example = @import("example");
 const other = @import("other");
 
-const Size = wool.Size;
+const Size = soft.Size;
 
-pub const Grid = wool.DynamicGrid(.{
+pub const Grid = soft.DynamicGrid(.{
     .Cell = packed struct {
         r: u8,
         g: u8,
         b: u8,
 
-        pub usingnamespace wool.ColorHelpers(@This(), .{});
+        pub usingnamespace soft.ColorHelpers(@This(), .{});
     },
 });
 const Color = Grid.Cell;
@@ -305,7 +305,7 @@ fn run() !void {
 
     try terminal.enableAlternateScreenBuffer();
     try terminal.hideCursor();
-    try terminal.setTitle("Wool example", .{});
+    try terminal.setTitle("Soft example", .{});
 
     try setAbortSignalHandler(handleAbortSignal);
 
@@ -325,7 +325,7 @@ fn run() !void {
         );
     }
 
-    var time = wool.Time{};
+    var time = soft.Time{};
 
     while (true) {
         time.update(@as(f64, @floatFromInt(std.time.milliTimestamp())));

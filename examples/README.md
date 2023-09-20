@@ -1,6 +1,6 @@
 # examples
 
-These are the examples showcasing Wool and how it integrates into all kinds of environments.
+These are the examples showcasing Soft and how it integrates into all kinds of environments.
 This also serves as a playground.
 
 You are encouraged to hack on the examples and play around with them.

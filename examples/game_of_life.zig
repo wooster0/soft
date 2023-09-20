@@ -4,14 +4,14 @@ const std = @import("std");
 const mem = std.mem;
 const builtin = @import("builtin");
 
-const wool = @import("wool");
+const soft = @import("soft");
 const backend = @import("root"); // TODO: https://github.com/ziglang/zig/issues/14708: @import("backend");
 
 const Grid = backend.Grid;
 const grid = &backend.grid;
 const Color = Grid.Cell;
 
-const Life = wool.DynamicGrid(.{ .Cell = enum { live, dead } });
+const Life = soft.DynamicGrid(.{ .Cell = enum { live, dead } });
 
 var life: Life = undefined;
 

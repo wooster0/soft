@@ -8,25 +8,25 @@ const Build = std.Build;
 const Module = Build.Module;
 
 pub fn build(b: *std.build.Builder) !void {
-    const wool_module = b.createModule(.{
+    const soft_module = b.createModule(.{
         .source_file = .{ .path = "src/main.zig" },
     });
     const optimize = b.standardOptimizeOption(.{});
-    prepTests(b, optimize, wool_module);
-    try prepExamples(b, optimize, wool_module);
+    prepTests(b, optimize, soft_module);
+    try prepExamples(b, optimize, soft_module);
     // TODO: add a step named "example-test" or similar that compiles (but doesn't run)
     //       all examples with all example backends to check for regressions,
     //       or even better: don't produce binaries but only do the semantic analysis.
     //       in that case it can be done as part of "zig build test" rather than a separate command
 }
 
-fn prepTests(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_module: *Module) void {
+fn prepTests(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, soft_module: *Module) void {
     const tests = b.addTest(.{
         .root_source_file = .{ .path = "src/main.zig" },
         .optimize = optimize,
     });
     const test_step = b.step("test", "Run all tests");
-    tests.addModule("wool", wool_module);
+    tests.addModule("soft", soft_module);
     test_step.dependOn(&tests.step);
 }
 
@@ -41,7 +41,7 @@ const example_backend_names = example_backend_names: {
     break :example_backend_names names;
 };
 
-fn prepExamples(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_module: *Module) !void {
+fn prepExamples(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, soft_module: *Module) !void {
     // there are two ways to get arguments:
     // * b.option
     // * b.args
@@ -62,7 +62,7 @@ fn prepExamples(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_
         //       Windows -> DirectX
         //       Linux -> Vulkan
         //       other cases -> OpenGL
-        return buildExample(b, optimize, example_name, example_backend orelse "terminal", wool_module);
+        return buildExample(b, optimize, example_name, example_backend orelse "terminal", soft_module);
     } else if (example_backend != null) {
         std.debug.print("specify an example with -Dexample\n", .{});
         os.exit(0);
@@ -78,7 +78,7 @@ fn prepExamples(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, wool_
 
 const list_item_prefix = "∙ ";
 
-fn buildExample(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, example_name: []const u8, example_backend_name: []const u8, wool_module: *Module) !void {
+fn buildExample(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, example_name: []const u8, example_backend_name: []const u8, soft_module: *Module) !void {
     const example_dir = try std.fs.cwd().openDir("examples", .{});
     // there are two kinds of examples:
     // one has a directory with a main.zig and the other is a standalone file
@@ -100,7 +100,7 @@ fn buildExample(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, examp
     // this is the backend-agnostic example that makes use of the backend behind the scenes
     const example_module = b.createModule(.{
         .source_file = .{ .path = example_pkg_path },
-        .dependencies = &.{ .{ .name = "wool", .module = wool_module }, .{ .name = "backend", .module = backend_module } },
+        .dependencies = &.{ .{ .name = "soft", .module = soft_module }, .{ .name = "backend", .module = backend_module } },
     });
 
     // this is code shared across backends only to be used by backends (internal)
@@ -115,17 +115,17 @@ fn buildExample(b: *std.build.Builder, optimize: std.builtin.OptimizeMode, examp
     if (std.meta.stringToEnum(ExampleBackend, example_backend_name)) |example_backend| {
         try switch (example_backend) {
             .none => @import("examples/backends/none/build.zig")
-                .build(b, optimize, wool_module, example_module, other_module),
+                .build(b, optimize, soft_module, example_module, other_module),
             .opengl => @import("examples/backends/opengl/build.zig")
-                .build(b, optimize, wool_module, example_module, other_module),
+                .build(b, optimize, soft_module, example_module, other_module),
             .terminal => @import("examples/backends/terminal/build.zig")
-                .build(b, optimize, wool_module, example_module, other_module),
+                .build(b, optimize, soft_module, example_module, other_module),
             .uefi => @import("examples/backends/uefi/build.zig")
-                .build(b, optimize, wool_module, example_module, other_module),
+                .build(b, optimize, soft_module, example_module, other_module),
             .vulkan => @panic("todo"), //@import("examples/backends/vulkan/build.zig")
-            //.build(b, optimize, wool_module, example_module, other_module),
+            //.build(b, optimize, soft_module, example_module, other_module),
             .web => @import("examples/backends/web/build.zig")
-                .build(b, optimize, wool_module, example_module, other_module),
+                .build(b, optimize, soft_module, example_module, other_module),
         };
     } else {
         std.debug.print(

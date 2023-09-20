@@ -4,11 +4,11 @@ const uefi = std.os.uefi;
 const Status = uefi.Status;
 const assert = std.debug.assert;
 
-const wool = @import("wool");
+const soft = @import("soft");
 const example = @import("example");
 const other = @import("other");
 
-pub const Grid = wool.DynamicGrid(.{
+pub const Grid = soft.DynamicGrid(.{
     .Cell = extern struct {
         // color component order is reversed: BGR instead of RGB
         b: u8,
@@ -16,7 +16,7 @@ pub const Grid = wool.DynamicGrid(.{
         r: u8,
         reserved: u8 = undefined,
 
-        pub usingnamespace wool.ColorHelpers(@This(), .{});
+        pub usingnamespace soft.ColorHelpers(@This(), .{});
     },
 });
 const Color = Grid.Cell;
@@ -76,7 +76,7 @@ pub fn main() Status {
 
     // select a display resolution
     {
-        var sizes = allocator.alloc(wool.Size(u32), gop.mode.max_mode) catch return Status.OutOfResources;
+        var sizes = allocator.alloc(soft.Size(u32), gop.mode.max_mode) catch return Status.OutOfResources;
         defer allocator.free(sizes);
         var mode: u32 = 0;
         var info_size: usize = undefined;
@@ -110,7 +110,7 @@ pub fn main() Status {
 
     example.init() catch unreachable;
 
-    var time = wool.Time{};
+    var time = soft.Time{};
 
     while (true) {
         const now_ms = getMilliseconds() catch 0;

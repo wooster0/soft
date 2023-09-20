@@ -8,7 +8,7 @@ const webserver = @import("webserver.zig");
 pub fn build(
     b: *Build.Builder,
     optimize: std.builtin.OptimizeMode,
-    wool_module: *Module,
+    soft_module: *Module,
     example_module: *Module,
     other_module: *Module,
 ) !void {
@@ -28,7 +28,7 @@ pub fn build(
             .cpu_features_add = features,
         },
     });
-    wasm.addModule("wool", wool_module);
+    wasm.addModule("soft", soft_module);
     wasm.addModule("example", example_module);
     wasm.addModule("other", other_module);
     wasm.single_threaded = true;
@@ -36,8 +36,8 @@ pub fn build(
     const dest_path = thisDir();
     b.install_prefix = dest_path;
     b.install_path = dest_path;
-    wasm.override_dest_dir = .{ .custom = "static" }; // Names I considered for the root dir: static, www, public
-    b.installArtifact(wasm);
+    const install_wasm = b.addInstallArtifact(wasm, .{ .dest_dir = .{ .override = .{ .custom = "static" } } }); // Names I considered for the root dir: static, www, public
+    b.getInstallStep().dependOn(&install_wasm.step);
 
     // NOTE: in hindsight, I think it's a bad idea to automatically run the webserver like this and the user should be required to run it themselves, especially for development
     var run_webserver_step = try b.allocator.create(std.build.Step);

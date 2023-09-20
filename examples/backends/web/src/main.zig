@@ -1,13 +1,13 @@
 const std = @import("std");
 
-const wool = @import("wool");
+const soft = @import("soft");
 const example = @import("example");
 const other = @import("other");
 
 export const width: usize = 512;
 export const height: usize = 512;
 
-pub const Grid = wool.StaticGrid(
+pub const Grid = soft.StaticGrid(
     .{
         // This format is compatible with Canvas2D and WebGL.
         .Cell = packed struct {
@@ -16,7 +16,7 @@ pub const Grid = wool.StaticGrid(
             b: u8,
             a: u8 = 255,
 
-            pub usingnamespace wool.ColorHelpers(@This(), .{});
+            pub usingnamespace soft.ColorHelpers(@This(), .{});
         },
     },
     width,
@@ -32,7 +32,7 @@ pub var seed: u64 = undefined;
 
 export var grid_ptr = grid.cells();
 
-var time = wool.Time{};
+var time = soft.Time{};
 
 // straight from JS
 extern fn @"Math.random"() f64;

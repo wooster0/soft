@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const wool = @import("wool");
+const soft = @import("soft");
 const example = @import("example");
 const other = @import("other");
 
@@ -8,13 +8,13 @@ const c = @import("c.zig");
 
 const App = @import("App.zig");
 
-pub const Grid = wool.DynamicGrid(.{
+pub const Grid = soft.DynamicGrid(.{
     .Cell = extern struct {
         r: u8,
         g: u8,
         b: u8,
 
-        pub usingnamespace wool.ColorHelpers(@This(), .{});
+        pub usingnamespace soft.ColorHelpers(@This(), .{});
     },
 });
 const Color = Grid.Cell;
@@ -31,7 +31,7 @@ fn errorCallback(code: c_int, description: [*c]const u8) callconv(.C) void {
     std.debug.panic("GLFW error: {s} ({d})\n", .{ description, code });
 }
 
-var resize: ?wool.Size(usize) = null;
+var resize: ?soft.Size(usize) = null;
 
 fn windowSizeCallback(window: ?*c.GLFWwindow, width: c_int, height: c_int) callconv(.C) void {
     _ = window;
@@ -71,7 +71,7 @@ pub fn main() !void {
 
     try example.init();
 
-    var time = wool.Time{};
+    var time = soft.Time{};
 
     while (c.glfwWindowShouldClose(window) == c.GLFW_FALSE) {
         time.update(@as(f64, @floatFromInt(std.time.milliTimestamp())));
@@ -106,7 +106,7 @@ fn createWindow() *c.GLFWwindow {
 
     c.glfwWindowHint(c.GLFW_RESIZABLE, c.GLFW_FALSE); // TODO: c.GLFW_TRUE later
 
-    const window = c.glfwCreateWindow(initial_window_size, initial_window_size, "Wool example", null, null) orelse {
+    const window = c.glfwCreateWindow(initial_window_size, initial_window_size, "Soft example", null, null) orelse {
         @panic("failed creating GLFW window");
     };
     // c.glfwMakeContextCurrent(window); // TODO: don't need this for Vulkan?
